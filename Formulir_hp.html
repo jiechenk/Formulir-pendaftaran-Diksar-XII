@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#16a34a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>TSCA - Pendaftaran Mobile</title>
+  
+  <!-- jsPDF & html2canvas untuk Export PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0ea5e9 0%, #10b981 50%, #eab308 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Header Mobile */
+    .mobile-header {
+      background: linear-gradient(135deg, #16a34a, #059669);
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .mobile-header img {
+      height: 50px;
+      margin-bottom: 8px;
+    }
+
+    .mobile-header h1 {
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .mobile-header .subtitle {
+      color: rgba(255,255,255,0.9);
+      font-size: 0.8rem;
+      margin-top: 3px;
+    }
+
+    /* Swiper Container */
+    .swiper-wrapper {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .swiper-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    .swipe-section {
+      min-width: 100vw;
+      width: 100vw;
+      scroll-snap-align: start;
+      padding: 15px;
+      padding-bottom: 80px;
+    }
+
+    /* Card Container */
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      margin-bottom: 15px;
+    }
+
+    .card h2 {
+      color: #16a34a;
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 10px;
+    }
+
+    .card h3 {
+      color: #16a34a;
+      font-size: 1.1rem;
+      margin: 20px 0 12px 0;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      color: #374151;
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #16a34a;
+      box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 400;
+    }
+
+    .radio-group input {
+      width: auto;
+      transform: scale(1.2);
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: start;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: rgba(22,163,74,0.05);
+      border-radius: 8px;
+    }
+
+    .checkbox-item input {
+      margin-top: 3px;
+      transform: scale(1.2);
+    }
+
+    .checkbox-item label {
+      flex: 1;
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    /* Equipment Table Mobile */
+    .equipment-list {
+      margin-top: 15px;
+    }
+
+    .equipment-item {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: start;
+      gap: 12px;
+    }
+
+    .equipment-item input[type="checkbox"] {
+      margin-top: 3px;
+      transform: scale(1.3);
+    }
+
+    .equipment-item .content {
+      flex: 1;
+    }
+
+    .equipment-item .name {
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+    }
+
+    .equipment-item .meta {
+      display: flex;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .badge-wajib {
+      background: #dc2626;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-opsional {
+      background: #059669;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, #16a34a, #059669);
+      color: white;
+      border: none;
+      padding: 14px 25px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 15px;
+      box-shadow: 0 4px 15px rgba(22,163,74,0.3);
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #16a34a;
+      border: 2px solid #16a34a;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:active {
+      background: rgba(22,163,74,0.1);
+    }
+
+    /* Navigation Dots */
+    .nav-dots {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      background: rgba(0,0,0,0.3);
+      padding: 8px 15px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      z-index: 99;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      transition: all 0.3s ease;
+    }
+
+    .nav-dot.active {
+      width: 24px;
+      border-radius: 4px;
+      background: white;
+    }
+
+    /* Status Summary */
+    .status-summary {
+      background: linear-gradient(135deg, rgba(22,163,74,0.1), rgba(5,150,105,0.1));
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .status-item:last-child {
+      border-bottom: none;
+    }
+
+    .status-complete {
+      color: #16a34a;
+      font-weight: 600;
+    }
+
+    .status-pending {
+      color: #dc2626;
+      font-weight: 600;
+    }
+
+    /* Activity Cards */
+    .activity-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .activity-card {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .activity-card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+    }
+
+    .activity-card h4 {
+      color: #16a34a;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .activity-card p {
+      font-size: 0.75rem;
+      color: #6b7280;
+      line-height: 1.3;
+    }
+
+    /* Signature Area */
+    .signature-box {
+      border: 2px dashed #16a34a;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      background: rgba(22,163,74,0.05);
+      margin-top: 20px;
+    }
+
+    .signature-box input {
+      margin-top: 10px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* Info Box */
+    .info-box {
+      background: linear-gradient(135deg, #16a34a, #059669);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 15px 0;
+    }
+
+    .info-box h4 {
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+
+    .info-box ol {
+      padding-left: 20px;
+      line-height: 1.8;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Swipe Indicator */
+    .swipe-hint {
+      text-align: center;
+      padding: 10px;
+      color: #6b7280;
+      font-size: 0.85rem;
+      animation: fadeInOut 3s infinite;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="mobile-header">
+    <img src="https://i.imgur.com/D0fmH74.png" alt="Logo TSCA">
+    <h1>DIKSAR XII</h1>
+    <div class="subtitle">Tropis Sulawesi Cinta Alam</div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Swiper Container -->
+  <div class="swiper-wrapper" id="swiperWrapper">
+    
+    <!-- Section 1: Pendaftaran -->
+    <div class="swipe-section" data-section="0">
+      <div class="card">
+        <h2>📋 Formulir Pendaftaran</h2>
+        
+        <h3>A. Data Pribadi</h3>
+        <div class="form-group">
+          <label>Nama Lengkap *</label>
+          <input type="text" id="nama_lengkap" required placeholder="Masukkan nama lengkap">
+        </div>
+        
+        <div class="form-group">
+          <label>Nama Panggilan *</label>
+          <input type="text" id="nama_panggilan" required placeholder="Masukkan nama panggilan">
+        </div>
+        
+        <div class="form-group">
+          <label>Tempat Lahir *</label>
+          <input type="text" id="tempat_lahir" required placeholder="Kota/Kabupaten">
+        </div>
+        
+        <div class="form-group">
+          <label>Tanggal Lahir *</label>
+          <input type="date" id="tanggal_lahir" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Jenis Kelamin *</label>
+          <div class="radio-group">
+            <label>
+              <input type="radio" name="jenis_kelamin" value="Laki-laki" required> Laki-laki
+            </label>
+            <label>
+              <input type="radio" name="jenis_kelamin" value="Perempuan" required> Perempuan
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Golongan Darah</label>
+          <select id="golongan_darah">
+            <option value="">Pilih Golongan Darah</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="AB">AB</option>
+            <option value="O">O</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Alamat Lengkap *</label>
+          <textarea id="alamat" required placeholder="Alamat lengkap sesuai KTP"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Nomor HP / WhatsApp *</label>
+          <input type="tel" id="no_hp" required placeholder="08xx xxxx xxxx">
+        </div>
+        
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="email" required placeholder="email@example.com">
+        </div>
+
+        <h3>B. Pendidikan & Pekerjaan</h3>
+        <div class="form-group">
+          <label>Pendidikan Terakhir *</label>
+          <select id="pendidikan" required>
+            <option value="">Pilih Pendidikan</option>
+            <option value="SMP/Sederajad">SMP/Sederajad</option>
+            <option value="SMA/SMK/MA">SMA/SMK/MA</option>
+            <option value="Diploma">Diploma</option>
+            <option value="Sarjana">Sarjana</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Pekerjaan</label>
+          <input type="text" id="pekerjaan" placeholder="Pelajar/Mahasiswa/Pekerja">
+        </div>
+
+        <h3>C. Pengalaman & Minat</h3>
+        <div class="form-group">
+          <label>Pengalaman Kegiatan Alam</label>
+          <textarea id="pengalaman_alam" placeholder="Contoh: hiking, camping, outbound"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Keahlian Khusus</label>
+          <textarea id="keahlian" placeholder="P3K, navigasi, fotografi, dll"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Harapan & Alasan Bergabung *</label>
+          <textarea id="harapan_alasan" required placeholder="Ceritakan motivasi Anda"></textarea>
+        </div>
+
+        <h3>D. Persetujuan</h3>
+        <div class="checkbox-item">
+          <input type="checkbox" id="persetujuan" required>
+          <label for="persetujuan">Saya menyatakan data di atas benar dan bersedia mematuhi peraturan komunitas</label>
+        </div>
+
+        <div class="signature-box">
+          <p><strong>Tanda Tangan Digital</strong></p>
+          <input type="text" id="nama_ttd" placeholder="Ketik nama lengkap">
+          <p style="margin-top: 10px; font-size: 0.85rem; color: #666;">
+            Tanggal: <span id="current-date"></span>
+          </p>
+        </div>
+
+        <button class="btn-primary" onclick="exportToPDF('pendaftaran')">📄 Export PDF</button>
+      </div>
+      <div class="swipe-hint">← Geser untuk melihat section berikutnya →</div>
+    </div>
+
+    <!-- Section 2: Izin Orang Tua -->
+    <div class="swipe-section" data-section="1">
+      <div class="card">
+        <h2>👪 Surat Izin Orang Tua</h2>
+        
+        <p style="margin-bottom: 20px; line-height: 1.5; font-size: 0.9rem;">
+          Kepada Yth.<br>
+          <strong>Ketua Tropis Sulawesi Cinta Alam</strong><br>
+          Di Tempat
+        </p>
+
+        <h3>Data Orang Tua/Wali</h3>
+        <div class="form-group">
+          <label>Nama Orang Tua/Wali *</label>
+          <input type="text" id="nama_ortu" required placeholder="Nama lengkap">
+        </div>
+        
+        <div class="form-group">
+          <label>Tempat Lahir *</label>
+          <input type="text" id="tempat_lahir_ortu" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Tanggal Lahir *</label>
+          <input type="date" id="tanggal_lahir_ortu" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Nomor HP *</label>
+          <input type="tel" id="no_hp_ortu" required placeholder="08xx xxxx xxxx">
+        </div>
+        
+        <div class="form-group">
+          <label>Alamat *</label>
+          <textarea id="alamat_ortu" required></textarea>
+        </div>
+
+        <h3>Data Calon Anggota</h3>
+        <div class="form-group">
+          <label>Nama Calon Anggota *</label>
+          <input type="text" id="nama_calon" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Tempat Lahir *</label>
+          <input type="text" id="tempat_lahir_calon" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Tanggal Lahir *</label>
+          <input type="date" id="tanggal_lahir_calon" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Alamat *</label>
+          <textarea id="alamat_calon" required></textarea>
+        </div>
+
+        <div style="background: rgba(22,163,74,0.1); padding: 15px; border-radius: 12px; margin: 20px 0;">
+          <p style="margin-bottom: 12px; font-weight: 600;">Pernyataan Izin:</p>
+          
+          <div class="checkbox-item">
+            <input type="checkbox" id="izin1" required>
+            <label for="izin1">Anak saya akan mematuhi peraturan yang berlaku</label>
+          </div>
+          
+          <div class="checkbox-item">
+            <input type="checkbox" id="izin2" required>
+            <label for="izin2">Saya memahami risiko kegiatan alam terbuka</label>
+          </div>
+          
+          <div class="checkbox-item">
+            <input type="checkbox" id="izin3" required>
+            <label for="izin3">Saya bersedia mendukung dan memberikan informasi kesehatan</label>
+          </div>
+        </div>
+
+        <div class="signature-box">
+          <p><strong>Makassar, <span id="current-date-2"></span></strong></p>
+          <p style="margin: 15px 0;"><strong>Orang Tua/Wali,</strong></p>
+          <input type="text" id="nama_ttd_ortu" placeholder="Ketik nama lengkap">
+        </div>
+
+        <button class="btn-primary" onclick="exportToPDF('izin-ortu')">📄 Export PDF</button>
+      </div>
+      <div class="swipe-hint">← Geser untuk navigasi →</div>
+    </div>
+
+    <!-- Section 3: Perlengkapan -->
+    <div class="swipe-section" data-section="2">
+      <div class="card">
+        <h2>🎒 Daftar Perlengkapan</h2>
+        
+        <h3>Perlengkapan Pribadi</h3>
+        <div class="equipment-list">
+          <div class="equipment-item">
+            <input type="checkbox" name="eq1">
+            <div class="content">
+              <div class="name">Tas ransel medium/besar</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 unit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq2">
+            <div class="content">
+              <div class="name">Tas selempang</div>
+              <div class="meta">
+                <span class="badge-opsional">OPSIONAL</span>
+                <span>1 unit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq3">
+            <div class="content">
+              <div class="name">Kantung tidur (sleeping bag)</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 unit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq4">
+            <div class="content">
+              <div class="name">Matras/alas tidur</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 unit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq5">
+            <div class="content">
+              <div class="name">Selimut aluminium darurat</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 unit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq6">
+            <div class="content">
+              <div class="name">Pakaian trekking + cadangan</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 set</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq7">
+            <div class="content">
+              <div class="name">Jaket gunung</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 unit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq8">
+            <div class="content">
+              <div class="name">Sepatu trekking</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 pasang</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq9">
+            <div class="content">
+              <div class="name">Alas kaki cadangan</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 pasang</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq10">
+            <div class="content">
+              <div class="name">Kaus kaki + cadangan</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>2-3 pasang</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq11">
+            <div class="content">
+              <div class="name">Sarung tangan</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 pasang</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq12">
+            <div class="content">
+              <div class="name">Topi & kupluk</div>
+              <div class="meta">
+                <span class="badge-opsional">OPSIONAL</span>
+                <span>1 unit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq13">
+            <div class="content">
+              <div class="name">Jas hujan</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 unit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq14">
+            <div class="content">
+              <div class="name">Senter/Headlamp + baterai</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 unit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq15">
+            <div class="content">
+              <div class="name">Botol minum (min 500ml)</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1-2 unit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq16">
+            <div class="content">
+              <div class="name">Alat makan & minum pribadi</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 set</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq17">
+            <div class="content">
+              <div class="name">Kantung sampah (trashbag)</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>2-3 unit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq18">
+            <div class="content">
+              <div class="name">Tisu kering/kain pembersih</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>Secukupnya</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq19">
+            <div class="content">
+              <div class="name">Masker & hand sanitizer</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>Secukupnya</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq20">
+            <div class="content">
+              <div class="name">Obat-obatan pribadi</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>Secukupnya</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq21">
+            <div class="content">
+              <div class="name">Makanan ringan pribadi</div>
+              <div class="meta">
+                <span class="badge-opsional">OPSIONAL</span>
+                <span>Secukupnya</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq22">
+            <div class="content">
+              <div class="name">Alat komunikasi (HP/gadget)</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+                <span>1 unit</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="eq23">
+            <div class="content">
+              <div class="name">Alat dokumentasi</div>
+              <div class="meta">
+                <span class="badge-opsional">OPSIONAL</span>
+                <span>1 unit</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Perlengkapan Tambahan (jika ada)</label>
+          <textarea id="perlengkapan_tambahan" placeholder="Tulis perlengkapan lain yang akan dibawa"></textarea>
+        </div>
+
+        <h3>Perlengkapan Kelompok</h3>
+        <div class="equipment-list">
+          <div class="equipment-item">
+            <input type="checkbox" name="geq1">
+            <div class="content">
+              <div class="name">Tenda dome</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+              </div>
+              <input type="text" placeholder="Nama PIC" style="margin-top: 8px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="geq2">
+            <div class="content">
+              <div class="name">Kompor gas + korek api</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+              </div>
+              <input type="text" placeholder="Nama PIC" style="margin-top: 8px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="geq3">
+            <div class="content">
+              <div class="name">Nesting/Cooking Set</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+              </div>
+              <input type="text" placeholder="Nama PIC" style="margin-top: 8px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="geq4">
+            <div class="content">
+              <div class="name">Tabung gas/bahan bakar</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+              </div>
+              <input type="text" placeholder="Nama PIC" style="margin-top: 8px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="geq5">
+            <div class="content">
+              <div class="name">Perkakas dapur</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+              </div>
+              <input type="text" placeholder="Nama PIC" style="margin-top: 8px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="geq6">
+            <div class="content">
+              <div class="name">Jeriken plastik (5-10L)</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+              </div>
+              <input type="text" placeholder="Nama PIC" style="margin-top: 8px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="geq7">
+            <div class="content">
+              <div class="name">Flysheet</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+              </div>
+              <input type="text" placeholder="Nama PIC" style="margin-top: 8px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="geq8">
+            <div class="content">
+              <div class="name">Tali-temali</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+              </div>
+              <input type="text" placeholder="Nama PIC" style="margin-top: 8px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="geq9">
+            <div class="content">
+              <div class="name">Pasak tenda & sekop mini</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+              </div>
+              <input type="text" placeholder="Nama PIC" style="margin-top: 8px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div class="equipment-item">
+            <input type="checkbox" name="geq10">
+            <div class="content">
+              <div class="name">Alat navigasi (kompas/GPS)</div>
+              <div class="meta">
+                <span class="badge-wajib">WAJIB</span>
+              </div>
+              <input type="text" placeholder="Nama PIC" style="margin-top: 8px; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Catatan Tambahan</label>
+          <textarea id="catatan_perlengkapan" placeholder="Catatan khusus terkait perlengkapan"></textarea>
+        </div>
+
+        <button class="btn-primary" onclick="exportToPDF('perlengkapan')">📄 Export PDF</button>
+      </div>
+      <div class="swipe-hint">← Geser untuk navigasi →</div>
+    </div>
+
+    <!-- Section 4: Ringkasan -->
+    <div class="swipe-section" data-section="3">
+      <div class="card">
+        <h2>📝 Ringkasan Pendaftaran</h2>
+        
+        <div class="status-summary">
+          <h4 style="color: #16a34a; margin-bottom: 12px;">Status Kelengkapan:</h4>
+          
+          <div class="status-item">
+            <span>📋 Formulir Pendaftaran</span>
+            <span id="form-status" class="status-pending">Belum Lengkap</span>
+          </div>
+          
+          <div class="status-item">
+            <span>👪 Izin Orang Tua</span>
+            <span id="parent-status" class="status-pending">Belum Lengkap</span>
+          </div>
+          
+          <div class="status-item">
+            <span>🎒 Checklist Perlengkapan</span>
+            <span id="equipment-status" class="status-pending">Belum Lengkap</span>
+          </div>
+        </div>
+
+        <h3>🌟 Aktivitas Utama TSCA</h3>
+        <div class="activity-grid">
+          <div class="activity-card">
+            <div class="icon">🌳</div>
+            <h4>Konservasi</h4>
+            <p>Menjaga kelestarian hutan dan ekosistem tropis</p>
+          </div>
+          
+          <div class="activity-card">
+            <div class="icon">🏔️</div>
+            <h4>Mountaineering</h4>
+            <p>Pendakian gunung secara bertanggung jawab</p>
+          </div>
+          
+          <div class="activity-card">
+            <div class="icon">🧗</div>
+            <h4>Climb</h4>
+            <p>Panjat tebing untuk melatih fisik dan mental</p>
+          </div>
+          
+          <div class="activity-card">
+            <div class="icon">🕳️</div>
+            <h4>Caving</h4>
+            <p>Eksplorasi gua untuk penelitian dan petualangan</p>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <h4>🚀 Langkah Selanjutnya:</h4>
+          <ol>
+            <li>Lengkapi semua form di section sebelumnya</li>
+            <li>Pastikan surat izin orang tua telah diisi</li>
+            <li>Periksa kembali daftar perlengkapan</li>
+            <li>Klik tombol "Kirim Pendaftaran"</li>
+            <li>Tunggu konfirmasi via WhatsApp/Email</li>
+            <li>Bergabung di grup WhatsApp komunitas</li>
+          </ol>
+        </div>
+
+        <button class="btn-primary" onclick="submitAllForms()">
+          🌿 KIRIM PENDAFTARAN LENGKAP
+        </button>
+        
+        <p style="margin-top: 12px; text-align: center; font-size: 0.85rem; color: #666;">
+          Dengan mengirim pendaftaran, Anda setuju dengan semua ketentuan yang berlaku
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation Dots -->
+  <div class="nav-dots" id="navDots">
+    <div class="nav-dot active"></div>
+    <div class="nav-dot"></div>
+    <div class="nav-dot"></div>
+    <div class="nav-dot"></div>
+  </div>
+
+  <script>
+    // Set tanggal otomatis
+    const today = new Date();
+    const dateString = today.toLocaleDateString('id-ID');
+    document.getElementById('current-date').textContent = dateString;
+    document.getElementById('current-date-2').textContent = dateString;
+
+    // Swiper functionality
+    const swiperWrapper = document.getElementById('swiperWrapper');
+    const navDots = document.querySelectorAll('.nav-dot');
+    let currentSection = 0;
+
+    // Update navigation dots
+    function updateNavDots(index) {
+      navDots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+      });
+    }
+
+    // Detect scroll position
+    swiperWrapper.addEventListener('scroll', () => {
+      const scrollLeft = swiperWrapper.scrollLeft;
+      const sectionWidth = window.innerWidth;
+      const newSection = Math.round(scrollLeft / sectionWidth);
+      
+      if (newSection !== currentSection) {
+        currentSection = newSection;
+        updateNavDots(currentSection);
+      }
+    });
+
+    // Click navigation dots to jump to section
+    navDots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        const sectionWidth = window.innerWidth;
+        swiperWrapper.scrollTo({
+          left: sectionWidth * index,
+          behavior: 'smooth'
+        });
+        currentSection = index;
+        updateNavDots(index);
+      });
+    });
+
+    // Auto-fill data from section 1 to section 2
+    document.getElementById('nama_lengkap').addEventListener('input', function() {
+      document.getElementById('nama_calon').value = this.value;
+    });
+    
+    document.getElementById('tempat_lahir').addEventListener('input', function() {
+      document.getElementById('tempat_lahir_calon').value = this.value;
+    });
+    
+    document.getElementById('tanggal_lahir').addEventListener('input', function() {
+      document.getElementById('tanggal_lahir_calon').value = this.value;
+    });
+    
+    document.getElementById('alamat').addEventListener('input', function() {
+      document.getElementById('alamat_calon').value = this.value;
+    });
+
+    // Check form completeness
+    function checkFormCompleteness() {
+      // Check main form
+      const mainFormFields = [
+        'nama_lengkap', 'nama_panggilan', 'tempat_lahir', 'tanggal_lahir',
+        'alamat', 'no_hp', 'email', 'pendidikan', 'harapan_alasan'
+      ];
+      
+      let mainFormComplete = true;
+      mainFormFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (!field || !field.value) mainFormComplete = false;
+      });
+      
+      const jenisKelamin = document.querySelector('input[name="jenis_kelamin"]:checked');
+      if (!jenisKelamin) mainFormComplete = false;
+      
+      const persetujuan = document.getElementById('persetujuan');
+      if (!persetujuan || !persetujuan.checked) mainFormComplete = false;
+
+      // Check parent form
+      const parentFormFields = [
+        'nama_ortu', 'tempat_lahir_ortu', 'tanggal_lahir_ortu', 'no_hp_ortu',
+        'alamat_ortu', 'nama_calon', 'tempat_lahir_calon', 'tanggal_lahir_calon',
+        'alamat_calon'
+      ];
+      
+      let parentFormComplete = true;
+      parentFormFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (!field || !field.value) parentFormComplete = false;
+      });
+      
+      const izinChecks = ['izin1', 'izin2', 'izin3'];
+      izinChecks.forEach(checkId => {
+        const check = document.getElementById(checkId);
+        if (!check || !check.checked) parentFormComplete = false;
+      });
+
+      // Check equipment
+      const equipmentChecked = document.querySelectorAll('input[name^="eq"]:checked').length;
+      const equipmentComplete = equipmentChecked >= 15;
+
+      // Update status
+      const formStatus = document.getElementById('form-status');
+      formStatus.textContent = mainFormComplete ? 'Lengkap ✓' : 'Belum Lengkap';
+      formStatus.className = mainFormComplete ? 'status-complete' : 'status-pending';
+
+      const parentStatus = document.getElementById('parent-status');
+      parentStatus.textContent = parentFormComplete ? 'Lengkap ✓' : 'Belum Lengkap';
+      parentStatus.className = parentFormComplete ? 'status-complete' : 'status-pending';
+
+      const equipmentStatus = document.getElementById('equipment-status');
+      equipmentStatus.textContent = equipmentComplete ? 'Lengkap ✓' : 'Belum Lengkap';
+      equipmentStatus.className = equipmentComplete ? 'status-complete' : 'status-pending';
+    }
+
+    // Listen to all input changes
+    document.addEventListener('input', checkFormCompleteness);
+    document.addEventListener('change', checkFormCompleteness);
+
+    // Initial check
+    checkFormCompleteness();
+
+    // Export to PDF function
+    async function exportToPDF(sectionId) {
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      loadingOverlay.classList.add('active');
+
+      try {
+        const { jsPDF } = window.jspdf;
+        
+        // Determine which section to export
+        let contentElement;
+        let fileName;
+        
+        if (sectionId === 'pendaftaran') {
+          contentElement = document.querySelector('[data-section="0"] .card');
+          fileName = 'Formulir_Pendaftaran.pdf';
+        } else if (sectionId === 'izin-ortu') {
+          contentElement = document.querySelector('[data-section="1"] .card');
+          fileName = 'Surat_Izin_Orang_Tua.pdf';
+        } else if (sectionId === 'perlengkapan') {
+          contentElement = document.querySelector('[data-section="2"] .card');
+          fileName = 'Daftar_Perlengkapan.pdf';
+        }
+
+        if (!contentElement) {
+          throw new Error('Content not found');
+        }
+
+        // Force black text and white background
+        const elements = contentElement.querySelectorAll('*');
+        const originalStyles = [];
+        
+        elements.forEach(el => {
+          originalStyles.push({
+            color: el.style.color,
+            background: el.style.background
+          });
+          el.style.color = 'black';
+        });
+
+        const originalBg = contentElement.style.background;
+        contentElement.style.background = 'white';
+
+        // Render to canvas
+        const canvas = await html2canvas(contentElement, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          logging: false
+        });
+
+        // Restore original styles
+        elements.forEach((el, i) => {
+          el.style.color = originalStyles[i].color;
+          el.style.background = originalStyles[i].background;
+        });
+        contentElement.style.background = originalBg;
+
+        // Create PDF
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        
+        let imgWidth = pageWidth - 20;
+        let imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        if (imgHeight > pageHeight - 40) {
+          imgHeight = pageHeight - 40;
+          imgWidth = (canvas.width * imgHeight) / canvas.height;
+        }
+
+        // Add logo
+        const logoUrl = "https://i.imgur.com/D0fmH74.png";
+        const logo = new Image();
+        logo.crossOrigin = "Anonymous";
+        logo.src = logoUrl;
+        
+        await new Promise((resolve) => {
+          logo.onload = resolve;
+          logo.onerror = resolve; // Continue even if logo fails
+        });
+        
+        pdf.addImage(logo, 'PNG', 10, 6, 15, 15);
+
+        // Add title
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('DIKSAR XII - TSCA', pageWidth / 2, 15, { align: 'center' });
+
+        // Add date
+        pdf.setFontSize(10);
+        pdf.text(`Tanggal: ${dateString}`, pageWidth - 15, 15, { align: 'right' });
+
+        // Add content
+        const x = (pageWidth - imgWidth) / 2;
+        const y = 25;
+        pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+
+        // Add footer
+        pdf.setFontSize(9);
+        pdf.setTextColor(80);
+        pdf.text('Generated by TSCA Registration System', pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+        // Save PDF
+        pdf.save(fileName);
+
+        loadingOverlay.classList.remove('active');
+        
+        // Show success message
+        setTimeout(() => {
+          alert('✅ PDF berhasil diunduh!');
+        }, 300);
+
+      } catch (error) {
+        loadingOverlay.classList.remove('active');
+        console.error('Error generating PDF:', error);
+        alert('❌ Gagal membuat PDF. Silakan coba lagi.');
+      }
+    }
+
+    // Submit all forms
+    function submitAllForms() {
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      
+      // Check if all forms are complete
+      const formStatus = document.getElementById('form-status');
+      const parentStatus = document.getElementById('parent-status');
+      const equipmentStatus = document.getElementById('equipment-status');
+      
+      const allComplete = 
+        formStatus.classList.contains('status-complete') &&
+        parentStatus.classList.contains('status-complete') &&
+        equipmentStatus.classList.contains('status-complete');
+      
+      if (!allComplete) {
+        alert('⚠️ Mohon lengkapi semua form terlebih dahulu!');
+        return;
+      }
+
+      loadingOverlay.classList.add('active');
+      
+      // Simulate submission
+      setTimeout(() => {
+        loadingOverlay.classList.remove('active');
+        
+        // Success message
+        alert('🎉 SELAMAT!\n\nPendaftaran Anda berhasil dikirim!\n\nTim kami akan menghubungi Anda segera via WhatsApp/Email.\n\nTerima kasih telah bergabung dengan Tropis Sulawesi Cinta Alam!');
+        
+        // Optionally reset forms or redirect
+        // location.reload();
+      }, 3000);
+    }
+
+    // Haptic feedback for mobile (if supported)
+    function triggerHaptic() {
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(10);
+      }
+    }
+
+    // Add haptic feedback to buttons
+    document.querySelectorAll('.btn-primary, .btn-secondary').forEach(btn => {
+      btn.addEventListener('click', triggerHaptic);
+    });
+
+    // Prevent zoom on double tap
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+
+    // Add smooth scroll behavior
+    swiperWrapper.style.scrollBehavior = 'smooth';
+  </script>
+</body>
+</html>
